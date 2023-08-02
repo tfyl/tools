@@ -31,7 +31,6 @@ import (
 	"syscall"
 
 	"net"
-	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -43,6 +42,8 @@ import (
 	"sync"
 	"time"
 	"unsafe"
+
+	"net/http"
 
 	"github.com/andybalholm/brotli"
 	"github.com/google/uuid"
@@ -453,17 +454,10 @@ func AesDecode(val string, key []byte) ([]byte, error) {
 	return src, nil
 }
 
-type readClose struct {
-	reader *brotli.Reader
-}
-
-func (obj *readClose) Read(p []byte) (n int, err error) { return obj.reader.Read(p) }
-func (obj *readClose) Close() error                     { return obj.reader.Reset(nil) }
-
 // 压缩解码
 func CompressionBrDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
 	rs := bytes.NewBuffer(nil)
-	return rs, CopyWitchContext(ctx, rs, &readClose{reader: brotli.NewReader(r)})
+	return rs, CopyWitchContext(ctx, rs, io.NopCloser(brotli.NewReader(r)))
 }
 func CompressionDeflateDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
 	rs, reader := bytes.NewBuffer(nil), flate.NewReader(r)
