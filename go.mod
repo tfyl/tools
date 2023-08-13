@@ -8,10 +8,10 @@ require (
 	github.com/andybalholm/brotli v1.0.5
 	github.com/google/uuid v1.3.0
 	github.com/json-iterator/go v1.1.12
-	github.com/tidwall/gjson v1.15.0
-	golang.org/x/image v0.10.0
-	golang.org/x/net v0.13.0
-	golang.org/x/text v0.11.0
+	github.com/tidwall/gjson v1.16.0
+	golang.org/x/image v0.11.0
+	golang.org/x/net v0.14.0
+	golang.org/x/text v0.12.0
 )
 
 require (
