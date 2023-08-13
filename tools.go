@@ -1031,3 +1031,15 @@ func Signal(preCtx context.Context, fun func()) {
 		}
 	}
 }
+func VerifyProxy(proxyUrl string) (*url.URL, error) {
+	proxy, err := url.Parse(proxyUrl)
+	if err != nil {
+		return nil, err
+	}
+	switch proxy.Scheme {
+	case "http", "socks5", "https":
+		return proxy, nil
+	default:
+		return nil, err
+	}
+}
