@@ -3,8 +3,8 @@ module gitee.com/baixudong/tools
 go 1.21.0
 
 require (
-	gitee.com/baixudong/kinds v0.0.0-20230726070402-0bc6b1ebb086
-	gitee.com/baixudong/re v0.0.0-20230726070429-e1a623b3c133
+	gitee.com/baixudong/kinds v0.0.0-20230809033013-c3d6d3479f8c
+	gitee.com/baixudong/re v0.0.0-20230809033040-360c1d945e59
 	github.com/andybalholm/brotli v1.0.5
 	github.com/google/uuid v1.3.0
 	github.com/json-iterator/go v1.1.12

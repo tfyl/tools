@@ -151,8 +151,7 @@ func DecodeRead(txt io.Reader, code string) io.Reader {
 }
 
 // 转成json
-func Any2json(data any) (gjson.Result, error) {
-	var result gjson.Result
+func Any2json(data any) (result gjson.Result, err error) {
 	switch value := data.(type) {
 	case []byte:
 		result = gjson.ParseBytes(value)
@@ -165,7 +164,10 @@ func Any2json(data any) (gjson.Result, error) {
 		}
 		result = gjson.ParseBytes(marstr)
 	}
-	return result, nil
+	if !result.IsObject() {
+		err = errors.New("不是一个json对象")
+	}
+	return
 }
 
 func JsonMarshal(data any) ([]byte, error) {
