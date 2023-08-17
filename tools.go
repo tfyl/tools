@@ -162,7 +162,7 @@ func Any2json(data any) (result gjson.Result, err error) {
 		}
 		result = gjson.ParseBytes(marstr)
 	}
-	if !result.IsObject() {
+	if !result.IsObject() && !result.IsArray() {
 		err = errors.New("不是一个json对象")
 	}
 	return
