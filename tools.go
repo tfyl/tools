@@ -457,12 +457,12 @@ func AesDecode(val string, key []byte) ([]byte, error) {
 // 压缩解码
 func CompressionBrDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
 	rs := bytes.NewBuffer(nil)
-	return rs, CopyWitchContext(ctx, rs, io.NopCloser(brotli.NewReader(r)))
+	return rs, CopyWitchContext(ctx, rs, io.NopCloser(brotli.NewReader(r)), true)
 }
 func CompressionDeflateDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
 	rs, reader := bytes.NewBuffer(nil), flate.NewReader(r)
 	defer reader.Close()
-	return rs, CopyWitchContext(ctx, rs, reader)
+	return rs, CopyWitchContext(ctx, rs, reader, true)
 }
 func CompressionGzipDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
 	reader, err := gzip.NewReader(r)
@@ -471,7 +471,7 @@ func CompressionGzipDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer,
 	}
 	defer reader.Close()
 	rs := bytes.NewBuffer(nil)
-	return rs, CopyWitchContext(ctx, rs, reader)
+	return rs, CopyWitchContext(ctx, rs, reader, true)
 }
 func CompressionZlibDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
 	reader, err := zlib.NewReader(r)
@@ -480,7 +480,7 @@ func CompressionZlibDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer,
 	}
 	defer reader.Close()
 	rs := bytes.NewBuffer(nil)
-	return rs, CopyWitchContext(ctx, rs, reader)
+	return rs, CopyWitchContext(ctx, rs, reader, true)
 }
 
 // 压缩解码
@@ -729,7 +729,7 @@ func WrapError(err error, val ...any) error {
 	return fmt.Errorf("%w,%s", err, fmt.Sprint(val...))
 }
 
-func CopyWitchContext(ctx context.Context, writer io.Writer, reader io.ReadCloser) (err error) {
+func CopyWitchContext(ctx context.Context, writer io.Writer, reader io.ReadCloser, cnlClose bool) (err error) {
 	defer func() {
 		if err != nil && errors.Is(err, io.ErrUnexpectedEOF) {
 			err = nil
@@ -756,7 +756,9 @@ func CopyWitchContext(ctx context.Context, writer io.Writer, reader io.ReadClose
 	}()
 	select {
 	case <-ctx.Done():
-		reader.Close()
+		if cnlClose {
+			reader.Close()
+		}
 		err = ctx.Err()
 	case <-done:
 	}
