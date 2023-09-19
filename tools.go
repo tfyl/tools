@@ -137,7 +137,7 @@ func Decode[T string | []byte](txt T, code string) T {
 	return result.(T)
 }
 
-// 转码
+// 编码转换
 func DecodeRead(txt io.Reader, code string) io.Reader {
 	switch code {
 	case "gb2312":
