@@ -33,14 +33,13 @@ import (
 	"unsafe"
 
 	"github.com/andybalholm/brotli"
-	"github.com/google/uuid"
 
 	_ "image/png"
 
 	_ "embed"
 
-	"gitee.com/baixudong/kinds"
-	"gitee.com/baixudong/re"
+	"github.com/gospider007/kinds"
+	"github.com/gospider007/re"
 	_ "golang.org/x/image/webp"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding/simplifiedchinese"
@@ -368,16 +367,16 @@ func AesDecode(val string, key []byte) ([]byte, error) {
 }
 
 // 压缩解码
-func CompressionBrDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
+func compressionBrDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
 	rs := bytes.NewBuffer(nil)
 	return rs, CopyWitchContext(ctx, rs, io.NopCloser(brotli.NewReader(r)), true)
 }
-func CompressionDeflateDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
+func compressionDeflateDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
 	rs, reader := bytes.NewBuffer(nil), flate.NewReader(r)
 	defer reader.Close()
 	return rs, CopyWitchContext(ctx, rs, reader, true)
 }
-func CompressionGzipDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
+func compressionGzipDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
 	reader, err := gzip.NewReader(r)
 	if err != nil {
 		return r, err
@@ -386,7 +385,7 @@ func CompressionGzipDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer,
 	rs := bytes.NewBuffer(nil)
 	return rs, CopyWitchContext(ctx, rs, reader, true)
 }
-func CompressionZlibDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
+func compressionZlibDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
 	reader, err := zlib.NewReader(r)
 	if err != nil {
 		return r, err
@@ -400,13 +399,13 @@ func CompressionZlibDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer,
 func CompressionDecode(ctx context.Context, r *bytes.Buffer, encoding string) (*bytes.Buffer, error) {
 	switch encoding {
 	case "br":
-		return CompressionBrDecode(ctx, r)
+		return compressionBrDecode(ctx, r)
 	case "deflate":
-		return CompressionDeflateDecode(ctx, r)
+		return compressionDeflateDecode(ctx, r)
 	case "gzip":
-		return CompressionGzipDecode(ctx, r)
+		return compressionGzipDecode(ctx, r)
 	case "zlib":
-		return CompressionZlibDecode(ctx, r)
+		return compressionZlibDecode(ctx, r)
 	default:
 		return r, nil
 	}
@@ -691,9 +690,6 @@ func CopySlicess[T any](value [][]T) [][]T {
 	return copyValue
 }
 
-func Uuid() uuid.UUID {
-	return uuid.New()
-}
 func ImgDiffer(c, c2 []byte) (float64, error) {
 	img1, _, err := image.Decode(bytes.NewBuffer(c))
 	if err != nil {
@@ -716,4 +712,12 @@ func ImgDiffer(c, c2 []byte) (float64, error) {
 	}
 	score /= math.Pow(2, 16) * math.Pow(float64(bounds.Dx()), 2) * math.Pow(float64(bounds.Dy()), 2)
 	return score, nil
+}
+
+func AnyJoin[T any](values []T, sep string) string {
+	lls := make([]string, len(values))
+	for i, value := range values {
+		lls[i] = fmt.Sprint(value)
+	}
+	return strings.Join(lls, sep)
 }
