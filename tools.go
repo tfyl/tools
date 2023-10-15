@@ -45,7 +45,7 @@ import (
 	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
-// 路径是否存在
+// if exist return true
 func PathExist(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil {
@@ -61,13 +61,13 @@ func PathExist(path string) bool {
 	return true
 }
 
-// 创建目录
+// create dir
 func MkDir(path string) error {
 	err := os.MkdirAll(path, os.ModePerm)
 	return err
 }
 
-// 拼接url
+// join url patch
 func UrlJoin(base, href string) (string, error) {
 	baseUrl, err := url.Parse(base)
 	if err != nil {
@@ -80,14 +80,14 @@ func UrlJoin(base, href string) (string, error) {
 	return baseUrl.ResolveReference(refUrl).String(), nil
 }
 
-// 网页解码，并返回 编码
+// html auto decode
 func Charset(content []byte, content_type string) ([]byte, string, error) {
 	chset, chset_name, _ := charset.DetermineEncoding(content, content_type)
 	chset_content, err := chset.NewDecoder().Bytes(content)
 	return chset_content, chset_name, err
 }
 
-// 转码
+// content decode
 func Decode[T string | []byte](txt T, code string) T {
 	var result any
 	switch val := (any)(txt).(type) {
@@ -113,7 +113,7 @@ func Decode[T string | []byte](txt T, code string) T {
 	return result.(T)
 }
 
-// 编码转换
+// decode encoding with reader
 func DecodeRead(txt io.Reader, code string) io.Reader {
 	switch code {
 	case "gb2312":
@@ -124,7 +124,7 @@ func DecodeRead(txt io.Reader, code string) io.Reader {
 	return txt
 }
 
-// 合并两个结构体 *ci c2
+// merge two same struct
 func Merge(c1 any, c2 any) {
 	v2 := reflect.ValueOf(c2)             //初始化为c2保管的具体值的v2
 	v1_elem := reflect.ValueOf(c1).Elem() //返回 c1 指针保管的值
@@ -170,7 +170,7 @@ var zhNumMap = map[string]string{
 	"玖": "9",
 }
 
-// 文本解析时间
+// get time
 func GetTime(txt string, desc ...bool) string {
 	txt = re.SubFunc(zhNumStr, func(s string) string {
 		return zhNumMap[s]
@@ -215,27 +215,27 @@ func GetTime(txt string, desc ...bool) string {
 	return result
 }
 
-// 路径转义
+// escape path with file path
 func PathEscape(txt string) string { //空格转换%20
 	return url.PathEscape(txt)
 }
 
-// 路径解析
+// unescape path with file path
 func PathUnescape(txt string) (string, error) {
 	return url.PathUnescape(txt)
 }
 
-// 参数转义
+// escape path with url query
 func QueryEscape(txt string) string { //空格转换为+
 	return url.QueryEscape(txt)
 }
 
-// 参数解析
+// unescape path with url query
 func QueryUnescape(txt string) (string, error) {
 	return url.QueryUnescape(txt)
 }
 
-// 默认目录
+// user default dir
 func GetDefaultDir() (string, error) {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -252,12 +252,12 @@ func GetDefaultDir() (string, error) {
 	return "", errors.New("could not determine cache directory")
 }
 
-// 拼接路径
+// join path with file path
 func PathJoin(elem ...string) string {
 	return filepath.Join(elem...)
 }
 
-// aes加密
+// aes encode
 func AesEncode(val []byte, key []byte) (string, error) {
 	keyLen := len(key)
 	if keyLen > 16 {
@@ -279,7 +279,7 @@ func AesEncode(val []byte, key []byte) (string, error) {
 	return Base64Encode(val), nil
 }
 
-// HmacSha1 加密
+// HmacSha1 encode
 func HmacSha1[T string | []byte](val, key T) []byte {
 	var mac hash.Hash
 	switch con := (any)(key).(type) {
@@ -298,7 +298,7 @@ func HmacSha1[T string | []byte](val, key T) []byte {
 	return mac.Sum(nil)
 }
 
-// Sha1 加密
+// Sha1 encode
 func Sha1[T string | []byte](val T) []byte {
 	mac := sha1.New()
 	switch con := (any)(val).(type) {
@@ -310,7 +310,7 @@ func Sha1[T string | []byte](val T) []byte {
 	return mac.Sum(nil)
 }
 
-// md5 加密
+// md5 encode
 func Md5[T string | []byte](val T) [16]byte {
 	var result [16]byte
 	switch con := (any)(val).(type) {
@@ -322,7 +322,7 @@ func Md5[T string | []byte](val T) [16]byte {
 	return result
 }
 
-// base64 加密
+// base64 encode
 func Base64Encode[T string | []byte](val T) string {
 	switch con := (any)(val).(type) {
 	case string:
@@ -333,16 +333,17 @@ func Base64Encode[T string | []byte](val T) string {
 	return ""
 }
 
-// base64解密
+// base64 decode
 func Base64Decode(val string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(val)
 }
 
+// any to hex
 func Hex(val any) string {
 	return fmt.Sprintf("%x", val)
 }
 
-// ase解密
+// ase decode
 func AesDecode(val string, key []byte) ([]byte, error) {
 	src, err := Base64Decode(val)
 	if err != nil {
@@ -366,7 +367,6 @@ func AesDecode(val string, key []byte) ([]byte, error) {
 	return src, nil
 }
 
-// 压缩解码
 func compressionBrDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer, error) {
 	rs := bytes.NewBuffer(nil)
 	return rs, CopyWitchContext(ctx, rs, io.NopCloser(brotli.NewReader(r)), true)
@@ -395,7 +395,7 @@ func compressionZlibDecode(ctx context.Context, r *bytes.Buffer) (*bytes.Buffer,
 	return rs, CopyWitchContext(ctx, rs, reader, true)
 }
 
-// 压缩解码
+// compression decode
 func CompressionDecode(ctx context.Context, r *bytes.Buffer, encoding string) (*bytes.Buffer, error) {
 	switch encoding {
 	case "br":
@@ -411,7 +411,7 @@ func CompressionDecode(ctx context.Context, r *bytes.Buffer, encoding string) (*
 	}
 }
 
-// 字节串转字符串
+// bytes to string
 func BytesToString(b []byte) string {
 	if len(b) == 0 {
 		return ""
@@ -419,12 +419,11 @@ func BytesToString(b []byte) string {
 	return unsafe.String(&b[0], len(b))
 }
 
-// 字符串转字节串
+// string to bytes
 func StringToBytes(s string) []byte {
 	return unsafe.Slice(unsafe.StringData(s), len(s))
 }
 
-// 随机函数
 var Rand = rand.New(rand.NewSource(time.Now().UnixMilli()))
 
 var bidChars = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
@@ -432,7 +431,7 @@ var bidChars = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^
 var defaultAlphabet = []rune(bidChars)
 var defaultAlphabetLen = len(defaultAlphabet)
 
-// naoid 生成
+// create naoid
 func NaoId(l ...int) string {
 	var size int
 	if len(l) > 0 {
@@ -447,7 +446,7 @@ func NaoId(l ...int) string {
 	return string(id)
 }
 
-// naoid 生成
+// create naoid with string
 func NaoIdWithStr(val string, l ...int) string {
 	var size int
 	if len(l) > 0 {
@@ -601,10 +600,10 @@ func RanFloat64(val, val2 int64) float64 {
 	return float64(RanInt64(val, val2)) + Rand.Float64()
 }
 
-// :param point0: 起点
-// :param point1: 终点
-// :param control_point: 控制点
-// :param point_nums: 生成曲线坐标点的数量.数量越多图越凹凸不平，越少越平滑
+// :param point0: start
+// :param point1: end
+// :param control_point: contol
+// :param point_nums: Generate the number of curve coordinate points. The more the number, the more uneven the graph will be, and the less the number, the smoother it will be
 func GetTrack(point0, point1 [2]float64, point_nums float64) [][2]float64 {
 	x1, y1 := point1[0], point1[1]
 	abs_x := math.Abs(point0[0]-x1) / 2 //两点横坐标相减绝对值/2
@@ -621,6 +620,7 @@ func GetTrack(point0, point1 [2]float64, point_nums float64) [][2]float64 {
 	return pointList
 }
 
+// del slince with indexs
 func DelSliceIndex[T any](val []T, indexs ...int) []T {
 	indexs = kinds.NewSet(indexs...).Array()
 	l := len(indexs)
@@ -637,6 +637,7 @@ func DelSliceIndex[T any](val []T, indexs ...int) []T {
 		return val
 	}
 }
+
 func WrapError(err error, val ...any) error {
 	return fmt.Errorf("%w,%s", err, fmt.Sprint(val...))
 }
@@ -676,20 +677,6 @@ func CopyWitchContext(ctx context.Context, writer io.Writer, reader io.ReadClose
 	}
 	return
 }
-
-func CopySlices[T any](value []T) []T {
-	copyValue := make([]T, len(value))
-	copy(copyValue, value)
-	return copyValue
-}
-func CopySlicess[T any](value [][]T) [][]T {
-	copyValue := make([][]T, len(value))
-	for i := 0; i < len(value); i++ {
-		copyValue[i] = CopySlices(value[i])
-	}
-	return copyValue
-}
-
 func ImgDiffer(c, c2 []byte) (float64, error) {
 	img1, _, err := image.Decode(bytes.NewBuffer(c))
 	if err != nil {
