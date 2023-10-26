@@ -10,3 +10,8 @@ require (
 	golang.org/x/net v0.17.0
 	golang.org/x/text v0.13.0
 )
+
+replace (
+	github.com/gospider007/re latest => github.com/tfyl/re latest
+	github.com/gospider007/kinds latest => github.com/tfyl/kinds latest
+)
